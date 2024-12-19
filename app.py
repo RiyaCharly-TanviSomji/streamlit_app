@@ -41,6 +41,17 @@ def render_navbar():
                 color: #0056b3;
                 text-decoration: underline;
             }
+            body {
+                background-color: #f0f0f0; /* Light grey background */
+                color: #000000; /* Black text color */
+                font-family: Arial, sans-serif;
+            }
+            .css-1v3fvcr {  /* Custom CSS selector for Streamlit elements */
+                background-color: #f0f0f0;
+            }
+            .css-ffhzg2 {  /* Custom CSS selector for Streamlit elements */
+                color: #000000;
+            }
         </style>
         <div class="navbar">
             <a href="/?page=data_overview">Data Overview</a>
