@@ -11,73 +11,85 @@ from sklearn.ensemble import GradientBoostingRegressor
 # Load the dataset
 def load_data():
     data = pd.read_csv("datasets/merged_dataset.csv")
+
+    # Fill missing values only in numeric columns
     numeric_cols = data.select_dtypes(include=['number']).columns
     data[numeric_cols] = data[numeric_cols].fillna(data[numeric_cols].mean())
+
     return data
 
-# Navigation Header
-def navigation_bar():
+# Render navigation bar
+def render_navbar():
     st.markdown(
         """
         <style>
-        .nav-bar {
-            background-color: #4CAF50;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            padding: 10px 0;
-        }
-        .nav-bar a {
-            color: white;
-            text-align: center;
-            padding: 14px 20px;
-            text-decoration: none;
-            font-size: 18px;
-            font-weight: bold;
-        }
-        .nav-bar a:hover {
-            background-color: #ddd;
-            color: black;
-        }
+            .navbar {
+                background-color: #f8f9fa;
+                padding: 1rem;
+                border-bottom: 2px solid #dee2e6;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            .navbar a {
+                color: #007bff;
+                text-decoration: none;
+                font-size: 1.2rem;
+                margin: 0 1rem;
+            }
+            .navbar a:hover {
+                color: #0056b3;
+                text-decoration: underline;
+            }
         </style>
-        <div class="nav-bar">
-            <a href="/?page=Data%20Overview">Data Overview</a>
-            <a href="/?page=EDA">Exploratory Data Analysis</a>
-            <a href="/?page=Modeling">Modeling and Prediction</a>
+        <div class="navbar">
+            <a href="/?page=data_overview">Data Overview</a>
+            <a href="/?page=eda">Exploratory Data Analysis</a>
+            <a href="/?page=modeling">Modeling and Prediction</a>
         </div>
         """,
-        unsafe_allow_html=True,
+        unsafe_allow_html=True
     )
 
+# Main function
 def main():
-    st.set_page_config(layout="wide")
+    st.set_page_config(page_title="Beijing Air Quality Analysis", layout="wide")
 
-    # Show navigation
-    navigation_bar()
+    # Render the navigation bar
+    render_navbar()
 
-    # Get the page from the URL query parameters
+    # Get the current page from query parameters
     query_params = st.experimental_get_query_params()
-    page = query_params.get("page", ["Data Overview"])[0]
+    page = query_params.get("page", ["data_overview"])[0]
 
     data = load_data()
 
-    if page == "Data Overview":
+    if page == "data_overview":
         st.title("Dataset Overview")
         st.write("### Dataset Information")
         st.write(data.info())
         st.write("### First Few Rows of Data")
         st.write(data.head())
+
+        # Show summary statistics
         st.write("### Dataset Summary Statistics")
         st.write(data.describe())
 
-    elif page == "EDA":
+    elif page == "eda":
         st.title("Exploratory Data Analysis")
+
+        # Year range selection (2013 - 2017)
         st.write("### Filter Data by Year Range (2013 - 2017)")
         year_range = st.slider("Select Year Range", 2013, 2017, (2013, 2017))
+
+        # Filter data by the selected year range
         filtered_data = data[(data['year'] >= year_range[0]) & (data['year'] <= year_range[1])]
+
+        # Show filtered data
         st.write(f"Showing Data from {year_range[0]} to {year_range[1]}")
         st.write(filtered_data)
 
+        # PM2.5 Distribution
         st.write("### Distribution of PM2.5")
         plt.figure(figsize=(10, 6))
         sns.histplot(filtered_data['PM2.5'], kde=True, bins=40, color='skyblue', edgecolor='black', alpha=0.7)
@@ -88,30 +100,33 @@ def main():
         plt.tight_layout()
         st.pyplot()
 
+        # PM2.5 vs Temperature Hexbin Plot
         st.write("### PM2.5 vs Temperature (Hexbin Visualization)")
         plt.figure(figsize=(10, 6))
         plt.hexbin(filtered_data['TEMP'], filtered_data['PM2.5'], gridsize=30, cmap='coolwarm', mincnt=1)
         cb = plt.colorbar()
         cb.set_label('Counts')
-        plt.title("PM2.5 vs Temperature", fontsize=16)
-        plt.xlabel("Temperature (\u00b0C)", fontsize=14)
-        plt.ylabel("PM2.5 (\u00b5g/m\u00b3)", fontsize=14)
+        plt.title("PM2.5 vs Temperature (Hexbin Visualization)", fontsize=16)
+        plt.xlabel("Temperature (°C)", fontsize=14)
+        plt.ylabel("PM2.5 (µg/m³)", fontsize=14)
         plt.grid(alpha=0.3)
         st.pyplot()
 
+        # Correlation heatmap
         st.write("### Correlation Heatmap")
         numeric_data = filtered_data.select_dtypes(include=['number'])
         corr_matrix = numeric_data.corr()
+
         plt.figure(figsize=(12, 8))
         sns.heatmap(corr_matrix, annot=True, fmt=".2f", cmap="viridis", cbar=True, linewidths=0.5, square=True)
         plt.title('Correlation Heatmap', fontsize=16)
-        plt.xticks(fontsize=12, rotation=45)
-        plt.yticks(fontsize=12, rotation=0)
         plt.tight_layout()
         st.pyplot()
 
-    elif page == "Modeling":
+    elif page == "modeling":
         st.title("Modeling and Prediction")
+
+        # Features and target
         features = ['PM10', 'SO2', 'NO2', 'CO', 'O3', 'TEMP', 'PRES', 'DEWP', 'RAIN', 'WSPM']
         target = 'PM2.5'
 
@@ -119,11 +134,14 @@ def main():
         y = data[target]
         X = X.select_dtypes(include=['float64', 'int64'])
 
+        # Scale the features
         scaler = StandardScaler()
         X_scaled = scaler.fit_transform(X)
 
+        # Split the data into training and testing sets
         X_train, X_test, y_train, y_test = train_test_split(X_scaled, y, test_size=0.2, random_state=42)
 
+        # Linear Regression
         st.write("### Linear Regression")
         lr_model = LinearRegression()
         lr_model.fit(X_train, y_train)
@@ -133,6 +151,7 @@ def main():
         st.write(f"Mean Squared Error: {lr_mse:.4f}")
         st.write(f"R-squared: {lr_r2:.4f}")
 
+        # Gradient Boosting Regressor
         st.write("### Gradient Boosting Regressor")
         gb_model = GradientBoostingRegressor(random_state=42)
         gb_model.fit(X_train, y_train)
@@ -142,6 +161,7 @@ def main():
         st.write(f"Mean Squared Error: {gb_mse:.4f}")
         st.write(f"R-squared: {gb_r2:.4f}")
 
+        # Actual vs Predicted Values (Gradient Boosting)
         st.write("### Gradient Boosting: Actual vs Predicted Values")
         plt.figure(figsize=(10, 6))
         plt.scatter(y_test, gb_pred, color='blue', alpha=0.6, edgecolors='k', label='Predictions')
@@ -150,17 +170,6 @@ def main():
         plt.xlabel('Actual Values (y_test)', fontsize=14)
         plt.ylabel('Predicted Values (gb_pred)', fontsize=14)
         plt.legend(fontsize=12)
-        plt.grid(alpha=0.3)
-        st.pyplot()
-
-        st.write("### Gradient Boosting: Residuals Plot")
-        gb_residuals = y_test - gb_pred
-        plt.figure(figsize=(10, 6))
-        plt.scatter(gb_pred, gb_residuals, color='green', alpha=0.6, edgecolors='k')
-        plt.axhline(y=0, color='red', linestyle='dotted', linewidth=2)
-        plt.title('Gradient Boosting: Residuals Plot', fontsize=16)
-        plt.xlabel('Predicted Values (gb_pred)', fontsize=14)
-        plt.ylabel('Residuals (y_test - gb_pred)', fontsize=14)
         plt.grid(alpha=0.3)
         st.pyplot()
 
