@@ -8,6 +8,13 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingRegressor
 
+# Set the page configuration
+st.set_page_config(
+    page_title="Beijing Air Quality Analysis",
+    layout="wide",
+    initial_sidebar_state="expanded",
+)
+
 # Load the dataset
 def load_data():
     data = pd.read_csv("datasets/merged_dataset.csv")
@@ -19,13 +26,43 @@ def load_data():
     return data
 
 def main():
-    st.title("Beijing Air Quality Data Analysis")
+    # Custom CSS for styling
+    st.markdown(
+        """
+        <style>
+        .main-header {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        .sub-header {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #FF5722;
+        }
+        .stButton>button {
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .stButton>button:hover {
+            background-color: #45a049;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown("<div class='main-header'>Beijing Air Quality Data Analysis</div>", unsafe_allow_html=True)
+
     menu = ["Data Overview", "Exploratory Data Analysis (EDA)", "Modeling and Prediction"]
     choice = st.sidebar.selectbox("Select Section", menu)
     data = load_data()
 
     if choice == "Data Overview":
-        st.subheader("Dataset Overview")
+        st.markdown("<div class='sub-header'>Dataset Overview</div>", unsafe_allow_html=True)
         st.write("### Dataset Information")
         st.write(data.info())
         st.write("### First Few Rows of Data")
@@ -36,7 +73,7 @@ def main():
         st.write(data.describe())
 
     elif choice == "Exploratory Data Analysis (EDA)":
-        st.subheader("Exploratory Data Analysis")
+        st.markdown("<div class='sub-header'>Exploratory Data Analysis</div>", unsafe_allow_html=True)
 
         # Year range selection (2013 - 2017)
         st.write("### Filter Data by Year Range (2013 - 2017)")
@@ -63,11 +100,11 @@ def main():
         # Check for missing values and handle them
         st.write("### Checking for Missing Values")
         if filtered_data[['PM2.5', 'TEMP']].isnull().any().any():
-            st.write("Dataset contains missing values. Filling them with mean values.")
+            st.warning("Dataset contains missing values. Filling them with mean values.")
             filtered_data['PM2.5'].fillna(filtered_data['PM2.5'].mean(), inplace=True)
             filtered_data['TEMP'].fillna(filtered_data['TEMP'].mean(), inplace=True)
         else:
-            st.write("No missing values found in PM2.5 and Temperature columns.")
+            st.success("No missing values found in PM2.5 and Temperature columns.")
 
         # PM2.5 vs Temperature Hexbin Plot
         st.write("### PM2.5 vs Temperature (Hexbin Visualization)")
@@ -76,8 +113,8 @@ def main():
         cb = plt.colorbar()
         cb.set_label('Counts')
         plt.title("PM2.5 vs Temperature (Hexbin Visualization)", fontsize=16)
-        plt.xlabel("Temperature (\u00b0C)", fontsize=14)
-        plt.ylabel("PM2.5 (\u00b5g/m\u00b3)", fontsize=14)
+        plt.xlabel("Temperature (°C)", fontsize=14)
+        plt.ylabel("PM2.5 (µg/m³)", fontsize=14)
         plt.grid(alpha=0.3)
         st.pyplot()
 
@@ -95,7 +132,7 @@ def main():
         st.pyplot()
 
     elif choice == "Modeling and Prediction":
-        st.subheader("Modeling and Prediction")
+        st.markdown("<div class='sub-header'>Modeling and Prediction</div>", unsafe_allow_html=True)
 
         # Features and target
         features = ['PM10', 'SO2', 'NO2', 'CO', 'O3', 'TEMP', 'PRES', 'DEWP', 'RAIN', 'WSPM']
@@ -119,8 +156,8 @@ def main():
         lr_pred = lr_model.predict(X_test)
         lr_mse = mean_squared_error(y_test, lr_pred)
         lr_r2 = r2_score(y_test, lr_pred)
-        st.write(f"Mean Squared Error: {lr_mse:.4f}")
-        st.write(f"R-squared: {lr_r2:.4f}")
+        st.metric(label="Mean Squared Error", value=f"{lr_mse:.4f}")
+        st.metric(label="R-squared", value=f"{lr_r2:.4f}")
 
         # Gradient Boosting Regressor
         st.write("### Gradient Boosting Regressor")
@@ -129,8 +166,8 @@ def main():
         gb_pred = gb_model.predict(X_test)
         gb_mse = mean_squared_error(y_test, gb_pred)
         gb_r2 = r2_score(y_test, gb_pred)
-        st.write(f"Mean Squared Error: {gb_mse:.4f}")
-        st.write(f"R-squared: {gb_r2:.4f}")
+        st.metric(label="Mean Squared Error", value=f"{gb_mse:.4f}")
+        st.metric(label="R-squared", value=f"{gb_r2:.4f}")
 
         # Actual vs Predicted Values (Gradient Boosting)
         st.write("### Gradient Boosting: Actual vs Predicted Values")
