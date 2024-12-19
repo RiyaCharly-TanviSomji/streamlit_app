@@ -8,6 +8,8 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.preprocessing import StandardScaler
 from sklearn.ensemble import GradientBoostingRegressor
 
+st.set_page_config(theme="light")
+
 # Load the dataset
 def load_data():
     data = pd.read_csv("datasets/merged_dataset.csv")
