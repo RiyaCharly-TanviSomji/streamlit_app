@@ -84,8 +84,6 @@ def main():
 
     elif page == "modeling":
         render_modeling(data)
-
-
 # Render Data Overview Page
 def render_data_overview(data):
     st.title("Dataset Overview")
@@ -95,8 +93,6 @@ def render_data_overview(data):
     st.write(data.head())
     st.write("### Dataset Summary Statistics")
     st.write(data.describe())
-
-
 # Render Exploratory Data Analysis Page
 def render_eda(data):
     st.title("Exploratory Data Analysis")
@@ -121,8 +117,6 @@ def render_eda(data):
     # Correlation heatmap
     st.write("### Correlation Heatmap")
     visualize_correlation_heatmap(filtered_data)
-
-
 # Visualizations for EDA
 def visualize_pm25_distribution(data):
     bins = [0, 25, 50, 75, 100, 150, 200, 300]
@@ -140,7 +134,6 @@ def visualize_pm25_distribution(data):
     plt.tight_layout()
     st.pyplot()
 
-
 def visualize_pm25_vs_temp(data):
     if data[['PM2.5', 'TEMP']].isnull().any().any():
         data['PM2.5'].fillna(data['PM2.5'].mean(), inplace=True)
@@ -156,7 +149,6 @@ def visualize_pm25_vs_temp(data):
     plt.grid(alpha=0.3)
     st.pyplot()
 
-
 def visualize_correlation_heatmap(filtered_data):
     numeric_data = filtered_data.select_dtypes(include=['number'])
     corr_matrix = numeric_data.corr()
@@ -166,7 +158,6 @@ def visualize_correlation_heatmap(filtered_data):
     plt.title('Correlation Heatmap', fontsize=16)
     plt.tight_layout()
     st.pyplot()
-
 
 # Render Modeling Page
 def render_modeling(data):
@@ -194,7 +185,6 @@ def render_modeling(data):
     st.write("### Gradient Boosting Regressor")
     train_gradient_boosting(X_train, X_test, y_train, y_test)
 
-
 # Train and Visualize Models
 def train_linear_regression(X_train, X_test, y_train, y_test):
     lr_model = LinearRegression()
@@ -218,9 +208,6 @@ def train_linear_regression(X_train, X_test, y_train, y_test):
     plt.grid(alpha=0.4)
     plt.tight_layout()
     st.pyplot()
-
-
-
 
 def train_gradient_boosting(X_train, X_test, y_train, y_test):
     gb_model = GradientBoostingRegressor(random_state=42)
@@ -247,7 +234,6 @@ def train_gradient_boosting(X_train, X_test, y_train, y_test):
     plt.tight_layout()
     st.pyplot()
 
-
 def visualize_actual_vs_predicted(y_test, y_pred, title):
     plt.figure(figsize=(12, 7))
     sns.regplot(x=y_test, y=y_pred, scatter_kws={'color': 'teal', 'alpha': 0.6, 's': 80},
@@ -258,7 +244,6 @@ def visualize_actual_vs_predicted(y_test, y_pred, title):
     plt.grid(alpha=0.4)
     plt.tight_layout()
     st.pyplot()
-
 
 # Entry Point
 if __name__ == "__main__":
