@@ -206,6 +206,20 @@ def train_linear_regression(X_train, X_test, y_train, y_test):
     st.write(f"R-squared: {lr_r2:.4f}")
 
     visualize_actual_vs_predicted(y_test, y_pred, "Linear Regression")
+        # Residuals Plot for Linear Regression
+    residuals = y_test - y_pred
+    plt.figure(figsize=(12, 7))
+    sns.histplot(residuals, kde=True, bins=30, color='orchid', edgecolor='black', alpha=0.7)
+    plt.axvline(x=0, color='darkred', linestyle='--', linewidth=2, label='Zero Residual Line')
+    plt.title('Residuals Distribution', fontsize=18, fontweight='bold', color='navy')
+    plt.xlabel('Residuals (y_test - y_pred)', fontsize=14)
+    plt.ylabel('Frequency', fontsize=14)
+    plt.legend(fontsize=12, loc='upper right')
+    plt.grid(alpha=0.4)
+    plt.tight_layout()
+    st.pyplot()
+
+
 
 
 def train_gradient_boosting(X_train, X_test, y_train, y_test):
@@ -216,8 +230,23 @@ def train_gradient_boosting(X_train, X_test, y_train, y_test):
     gb_r2 = r2_score(y_test, gb_pred)
     st.write(f"Mean Squared Error: {gb_mse:.4f}")
     st.write(f"R-squared: {gb_r2:.4f}")
+    
 
     visualize_actual_vs_predicted(y_test, gb_pred, "Gradient Boosting")
+
+        # Gradient Boosting: Residuals Plot
+    gb_residuals = y_test - gb_pred
+    plt.figure(figsize=(12, 7))
+    sns.residplot(x=gb_pred, y=gb_residuals, lowess=True, scatter_kws={'alpha': 0.7, 'color': 'blue'}, 
+                  line_kws={'color': 'red', 'linewidth': 2})
+    plt.axhline(y=0, color='black', linestyle='--', linewidth=1.5, label='Zero Line')
+    plt.title('Gradient Boosting: Residuals Plot', fontsize=18, fontweight='bold')
+    plt.xlabel('Predicted Values (gb_pred)', fontsize=14)
+    plt.ylabel('Residuals (y_test - gb_pred)', fontsize=14)
+    plt.legend(fontsize=12, loc='upper right')
+    plt.grid(alpha=0.4)
+    plt.tight_layout()
+    st.pyplot()
 
 
 def visualize_actual_vs_predicted(y_test, y_pred, title):
