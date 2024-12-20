@@ -237,8 +237,7 @@ def train_gradient_boosting(X_train, X_test, y_train, y_test):
         # Gradient Boosting: Residuals Plot
     gb_residuals = y_test - gb_pred
     plt.figure(figsize=(12, 7))
-    sns.residplot(x=gb_pred, y=gb_residuals, lowess=True, scatter_kws={'alpha': 0.7, 'color': 'blue'}, 
-                  line_kws={'color': 'red', 'linewidth': 2})
+    sns.residplot(x=gb_pred, y=gb_residuals, lowess=True, scatter_kws={'alpha': 0.7, 'color': 'blue'}, line_kws={'color': 'red', 'linewidth': 2})
     plt.axhline(y=0, color='black', linestyle='--', linewidth=1.5, label='Zero Line')
     plt.title('Gradient Boosting: Residuals Plot', fontsize=18, fontweight='bold')
     plt.xlabel('Predicted Values (gb_pred)', fontsize=14)
